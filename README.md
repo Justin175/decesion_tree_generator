@@ -4,7 +4,7 @@ A small algorithm to build a decision tree out of c++-conditions.
 
 Use this as follows:
 
-````python
+```python
 # write a condition
 condition = "a eq 10 and b eq 10 and k eq 10 or z eq 11"
 
