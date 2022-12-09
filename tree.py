@@ -4,16 +4,20 @@ from utils import OPERATORS
 class DecisionNode:
     _value : Any
     _id : int
+    _depth : int
 
     _parent : Any = None # Node
     _left : Any = None # Node
     _right : Any = None # Node
     _priority : int # None if variable
 
-    def __init__(self, value, id = 0) -> None:
+    def __init__(self, value, depth = 0, id = 0) -> None:
         self._value = value
         self._priority = OPERATORS.get(value, None)
         self._id = id
+        self._depth = depth
+        if self._priority is not None:
+            self._priority -= (depth * 10)
 
     def get_value(self) -> Any:
         return self._value
@@ -81,15 +85,22 @@ class DecisionTree:
     _root : DecisionNode = None
     _right : DecisionNode = None
     _next_id : int = 0
+    _depth = 0
 
     def __init__(self) -> None:
         pass
 
-    def insert(self, value, depth = 0):
-        node = DecisionNode(value, self._next_id)
+    def insert(self, value : str):
+        if value == "(":
+            self._depth += 1
+            return
+        if value == ")":
+            self._depth -= 1
+            return
+        
+        node = DecisionNode(value, self._depth, self._next_id)
         self._next_id += 1
 
-        print("---", value)
         if self._root is None: # if tree is empty
             self._root = node
             return
