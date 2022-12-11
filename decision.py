@@ -9,7 +9,3 @@ def parse_condition(cond : str) -> DecisionTree:
         tree.insert(a)
 
     return tree
-
-cond = "not ((a and b) or not (c and d)) neq (e < f)"
-parse_condition(cond).print_mermaid_str()
-

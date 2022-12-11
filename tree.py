@@ -1,8 +1,5 @@
 from typing import Any
 from utils import OPERATORS, RL_OPERATORS
-import sys
-
-sys.setrecursionlimit(1500)
 
 class DecisionNode:
     _value : Any
@@ -85,7 +82,7 @@ class DecisionNode:
             if node.get_priority() >= self._priority: # set as new parent
                 self._switch_root(node)
             else: # insert right
-                if self._right is None: # if right is None, then set it (nec. for rl-operators)
+                if self._right is None: # if right is None, then set it
                     self.set_right(node)
                 else:
                     self._right.insert(node)
