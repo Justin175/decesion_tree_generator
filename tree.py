@@ -1,5 +1,8 @@
 from typing import Any
-from utils import OPERATORS
+from utils import OPERATORS, RL_OPERATORS
+import sys
+
+sys.setrecursionlimit(1500)
 
 class DecisionNode:
     _value : Any
@@ -10,17 +13,24 @@ class DecisionNode:
     _left : Any = None # Node
     _right : Any = None # Node
     _priority : int # None if variable
+    _is_rl_operator : bool
+    _tree : Any
 
-    def __init__(self, value, depth = 0, id = 0) -> None:
+    def __init__(self, value, tree, depth = 0, id = 0) -> None:
         self._value = value
         self._priority = OPERATORS.get(value, None)
         self._id = id
         self._depth = depth
         if self._priority is not None:
-            self._priority -= (depth * 10)
+            self._priority -= (depth * 100)
+        self._is_rl_operator = value in RL_OPERATORS
+        self._tree = tree
 
     def get_value(self) -> Any:
         return self._value
+
+    def is_rl_operator(self) -> bool:
+        return self._is_rl_operator
 
     def get_left(self) -> Any:
         return self._left
@@ -48,22 +58,37 @@ class DecisionNode:
     def set_parent(self, parent : Any):
         self._parent = parent
 
-    def insert_right(self, node):
-        if self._left is None:
-            if self._priority is None:
-                # set new parent
-                self._parent.set_right(node)
-                node.set_right(self)
-            else:
-                self.set_left(node)
-        elif self._right is None:
-            self.set_right(node)
+    def _rot_left(self, node):
+        if self._parent is None:
+            self._tree.set_root(node)
         else:
-            if self._right.get_left() is None and self._parent is not None and node.get_priority() is not None and self._priority < node.get_priority(): # check for rotation
-                self._parent.set_right(node)
-                node.set_left(self)
-            else:
-                self._right.insert_right(node)
+            self._parent.set_right(node)
+        node.set_left(self)
+
+    def _switch_root(self, node):
+        if self._parent is None:
+            self._tree.set_root(node)
+        else:
+            self._parent.set_right(node)
+        node.set_left(self)
+
+    def insert(self, node):
+        if self._priority is None: # node is an OPERATOR
+            self._switch_root(node)
+        elif node.get_priority() is None: # node is a VAR, therefor self is a OPERATOR
+            if self._right is None:
+                self.set_right(node) # set in right leaf
+            else: # right is a OPERATOR, insert it
+                self._right.insert(node)
+        else: # node is a OPERATOR
+            # check the precedence...
+            if node.get_priority() >= self._priority: # set as new parent
+                self._switch_root(node)
+            else: # insert right
+                if self._right is None: # if right is None, then set it (nec. for rl-operators)
+                    self.set_right(node)
+                else:
+                    self._right.insert(node)
 
     def __repr__(self) -> str:
         return f"[value={self._value}, left={self._left}, right={self._right}]"
@@ -98,22 +123,17 @@ class DecisionTree:
             self._depth -= 1
             return
         
-        node = DecisionNode(value, self._depth, self._next_id)
+        node = DecisionNode(value, self, self._depth, self._next_id)
         self._next_id += 1
 
         if self._root is None: # if tree is empty
             self._root = node
             return
 
-        if self._root.get_priority() is None: # added node must be an OPERATOR ==> new root
-            node.set_left(self._root)
-            self._root = node
-        else: # add to right
-            if node.get_priority() is not None and node.get_priority() > self._root.get_priority(): # also new root
-                node.set_left(self._root)
-                self._root = node
-            else:
-                self._root.insert_right(node)
+        self._root.insert(node)
+
+    def set_root(self, root : DecisionNode):
+        self._root = root
 
     def print_mermaid_str(self):
         print("graph TD")
