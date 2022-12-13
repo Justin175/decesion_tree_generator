@@ -99,7 +99,7 @@ class DecisionNode:
             self._right.print_mermaid_str()
 
     def to_mermaid_str(self) -> str:
-        cnt = f"{self._id}({str(self._value).replace('(', '*').replace(')', '*')});"
+        cnt = f'{self._id}("{self._value}");'
         if self._parent is not None:
             cnt = f"{cnt}{self._parent.get_id()}-->{self._id};"
         
