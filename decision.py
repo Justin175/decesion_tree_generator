@@ -12,18 +12,17 @@ def parse_condition(cond : str) -> DecisionTree:
 
     for a in comp_it:
         if a == "(" and not is_operator: # Function-Call
-            cur_value = last_node.get_value() + "*"
+            cur_value = last_node.get_value() + "("
             # search for ')'
             cur_opend = 1
             while cur_opend > 0:
                 b = next(comp_it)
                 if b == "(":
                     cur_opend += 1
-                    cur_value += "*"
                 elif b == ")":
                     cur_opend -= 1
-                    cur_value += "*"
-                else: cur_value += b
+                
+                cur_value += b
 
             last_node.set_value(cur_value)
             continue

@@ -94,7 +94,7 @@ class DecisionNode:
         return f"[value={self._value}, left={self._left}, right={self._right}]"
 
     def print_mermaid_str(self) -> str:
-        print(f"{self._id}({self._value})")
+        print(f"{self._id}({str(self._value).replace('(', '*').replace(')', '*')})")
 
         if self._parent is not None:
             print(f"{self._parent.get_id()} --> {self._id}")
