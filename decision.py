@@ -1,9 +1,10 @@
 from tree import DecisionTree, DecisionNode
+from utils import OPERATORS
 
 def parse_condition(cond : str) -> DecisionTree:
     # after '(' following a non operator => Function call
     # add ' ' before and after all '(' and ')'
-    gen = (x if x not in "()" else f" {x} " for x in cond)
+    gen = (x if x not in "()" and x not in OPERATORS else f" {x} " for x in cond)
 
     tree = DecisionTree()
     is_operator : bool = False
