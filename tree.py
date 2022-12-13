@@ -58,13 +58,6 @@ class DecisionNode:
     def set_parent(self, parent : Any):
         self._parent = parent
 
-    def _rot_left(self, node):
-        if self._parent is None:
-            self._tree.set_root(node)
-        else:
-            self._parent.set_right(node)
-        node.set_left(self)
-
     def _switch_root(self, node):
         if self._parent is None:
             self._tree.set_root(node)
@@ -105,6 +98,18 @@ class DecisionNode:
         if self._right is not None:
             self._right.print_mermaid_str()
 
+    def to_mermaid_str(self) -> str:
+        cnt = f"{self._id}({str(self._value).replace('(', '*').replace(')', '*')});"
+        if self._parent is not None:
+            cnt = f"{cnt}{self._parent.get_id()}-->{self._id};"
+        
+        if self._left is not None:
+            cnt = f"{cnt}{self._left.to_mermaid_str()}"
+
+        if self._right is not None:
+            cnt = f"{cnt}{self._right.to_mermaid_str()}"
+
+        return cnt
 
 class DecisionTree:
     _root : DecisionNode = None
@@ -147,10 +152,12 @@ class DecisionTree:
         if self._root is not None:
             self._root.print_mermaid_str()
 
+    def to_mermaid_str(self) -> str:
+        cnt = "graph TD;"
+        if self._root is not None:
+            cnt = f"{cnt}{self._root.to_mermaid_str()}"
+
+        return cnt
+
     def __repr__(self) -> str:
         return f"Tree [{self._root}]"
-
-
-        
-        
-
