@@ -52,6 +52,9 @@ class DecisionNode:
         self._left = left
         left.set_parent(self)
 
+    def set_value(self, value : Any):
+        self._value = value
+
     def set_parent(self, parent : Any):
         self._parent = parent
 
@@ -112,22 +115,29 @@ class DecisionTree:
     def __init__(self) -> None:
         pass
 
-    def insert(self, value : str):
-        if value == "(":
-            self._depth += 1
-            return
-        if value == ")":
-            self._depth -= 1
-            return
-        
-        node = DecisionNode(value, self, self._depth, self._next_id)
-        self._next_id += 1
-
+    def insert_node(self, node : DecisionNode):
         if self._root is None: # if tree is empty
             self._root = node
             return
 
         self._root.insert(node)
+
+    def insert(self, value : str) -> DecisionNode:
+        if value == "(":
+            self._depth += 1
+            return None
+        if value == ")":
+            self._depth -= 1
+            return None
+        
+        node : DecisionNode
+        self.insert_node(node := self.create_node(value))
+        return node
+
+    def create_node(self, value) -> DecisionNode:
+        node =  DecisionNode(value, self, self._depth, self._next_id)
+        self._next_id += 1
+        return node
 
     def set_root(self, root : DecisionNode):
         self._root = root
